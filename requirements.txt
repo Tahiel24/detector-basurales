@@ -1,0 +1,19 @@
+# Procesamiento geoespacial
+rasterio>=1.3.0
+shapely>=2.0.0
+geopandas>=0.13.0
+pyproj<=3.7.0
+
+# Deep Learning y visión por computadora
+torch>=2.0.0
+torchvision
+opencv-python-headless
+albumentations>=2.0.0
+onnx
+
+# Utilidades, análisis y métricas
+tensorboard
+scikit-learn
+scikit-image
+pandas
+numpy
