@@ -216,3 +216,19 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Datos ráster y anotaciones pesadas
+data/raw/*
+!data/raw/.gitkeep
+data/annotations/*
+!data/annotations/.gitkeep
+data/outputs/*
+!data/outputs/.gitkeep
+
+# Modelos entrenados locales
+models/*.zip
+models/*.pth
+models/*.pt
+
+# Temporales de procesamiento
+data/tmp/
