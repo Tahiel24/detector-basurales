@@ -1,13 +1,13 @@
 # Configuración global del modelo de detección de basurales
 model:
-  architecture: "resnet18"
+  architecture: "resnet50"
   window_size: 480
   num_classes: 2
 
 training:
   batch_size: 4
   lr: 0.01
-  n_epochs: 15
+  n_epochs: 1
   mixed_precision: false
 
 classes:

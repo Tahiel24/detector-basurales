@@ -1,38 +1,40 @@
-# Usamos una imagen oficial de Python como base
 FROM python:3.10-slim
 
-# Directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Instalar dependencias del sistema operativo necesarias para GDAL, Rasterio y compilación
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     git \
+    patchelf \
     gdal-bin \
     libgdal-dev \
-    python3-gdal \
     libspatialindex-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Configurar variables de entorno para GDAL
 ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
 ENV C_INCLUDE_PATH=/usr/include/gdal
 
-# Actualizar pip e instalar herramientas de compilación de Python
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
-# Copiar el archivo de dependencias
 COPY requirements.txt .
-
-# Instalar las librerías especificadas en el requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar el código fuente y las configuraciones al contenedor
+# Raster Vision 0.21.3 (instala sus propias versiones fijadas de torch, numpy,
+# albumentations, onnxruntime-gpu, etc.)
+RUN git clone --depth 1 --branch v0.21.3 https://github.com/azavea/raster-vision.git && \
+    pip install --no-cache-dir ./raster-vision/rastervision_pipeline && \
+    pip install --no-cache-dir ./raster-vision/rastervision_core && \
+    pip install --no-cache-dir ./raster-vision/rastervision_pytorch_learner && \
+    pip install --no-cache-dir ./raster-vision/rastervision_aws_s3 && \
+    pip install --no-cache-dir ./raster-vision/rastervision_pytorch_backend
+
+# Corrige "cannot enable executable stack as shared object requires" (WSL2/Docker Desktop)
+RUN find /usr/local/lib/python3.10/site-packages/onnxruntime -name "*.so*" \
+    -exec patchelf --clear-execstack {} \;
+
 COPY config/ /app/config/
 COPY src/ /app/src/
 
-# Crear las carpetas de datos y modelos vacías por si no están montadas por volumen
 RUN mkdir -p /app/data/raw /app/data/annotations /app/data/outputs /app/models
 
-# Comando por defecto al iniciar el contenedor (se puede sobrescribir al correr docker run)
 CMD ["python3"]
